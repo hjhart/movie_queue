@@ -4,3 +4,5 @@ log/*.log
 tmp/
 .sass-cache/
 .idea/
+.DS_Store
+/searches

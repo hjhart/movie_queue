@@ -14,6 +14,7 @@ gem 'coffee-script'
 gem 'uglifier'
 gem 'jquery-rails'
 gem 'nokogiri'
+gem 'rottentomatoes'
 
 # Use unicorn as the web server
 # gem 'unicorn'

@@ -1,6 +1,7 @@
 MovieQueue::Application.routes.draw do
   resources :movies
   root :to => 'movies#index'
+  match 'movielist.json' => 'movies#list'
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

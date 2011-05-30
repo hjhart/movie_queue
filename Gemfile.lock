@@ -39,6 +39,7 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.1.1)
+    deepopenstruct (0.1.2)
     erubis (2.7.0)
     execjs (1.0.0)
       multi_json (~> 1.0)
@@ -47,6 +48,7 @@ GEM
     jquery-rails (1.0.9)
       railties (~> 3.0)
       thor (~> 0.14)
+    json (1.5.1)
     mail (2.3.0)
       i18n (>= 0.4.0)
       mime-types (~> 1.16)
@@ -79,6 +81,9 @@ GEM
       rake (>= 0.8.7)
       thor (~> 0.14.6)
     rake (0.9.0)
+    rottentomatoes (1.0.1)
+      deepopenstruct (>= 0.1.2)
+      json
     sass (3.1.1)
     sprockets (2.0.0.beta.8)
       hike (~> 1.0)
@@ -105,6 +110,7 @@ DEPENDENCIES
   jquery-rails
   nokogiri
   rails (= 3.1.0.rc1)
+  rottentomatoes
   sass
   sqlite3
   tpb (= 0.0.3)

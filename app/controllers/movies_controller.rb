@@ -1,6 +1,15 @@
 class MoviesController < ApplicationController
   # GET /movies
   # GET /movies.json
+  def list
+    @movies = Movie.get_movie_list(params[:q])
+    render json: @movies 
+  end
+
+  def get
+    Movie.enqueue_all
+  end
+
   def index
     @movies = Movie.all
 

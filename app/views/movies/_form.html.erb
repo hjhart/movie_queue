@@ -1,33 +1,43 @@
 <%= form_for(@movie) do |f| %>
-  <% if @movie.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@movie.errors.count, "error") %> prohibited this movie from being saved:</h2>
+    <% if @movie.errors.any? %>
+        <div id="error_explanation">
+          <h2><%= pluralize(@movie.errors.count, "error") %> prohibited this movie from being saved:</h2>
+          <ul>
+            <% @movie.errors.full_messages.each do |msg| %>
+                <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+    <% end %>
 
-      <ul>
-      <% @movie.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
+    <div class="field">
+      <%= f.label :name %>
+      <br/>
+      <%= f.text_field :name %><%= submit_tag("rtfetch") %>
     </div>
-  <% end %>
 
-  <div class="field">
-    <%= f.label :name %><br />
-    <%= f.text_field :name %>
-  </div>
-  <div class="field">
-    <%= f.label :active %><br />
-    <%= f.check_box :active %>
-  </div>
-  <div class="field">
-    <%= f.label :download_start %><br />
-    <%= f.check_box :download_start %>
-  </div>
-  <div class="field">
-    <%= f.label :download_finish %><br />
-    <%= f.check_box :download_finish %>
-  </div>
-  <div class="actions">
-    <%= f.submit %>
-  </div>
+    <div class="field">
+      <%= f.label :name %>
+      <br/>
+      <%= f.select(:name, ['Enter your query to get a list of movies'], {}, :disabled => true) %>
+    </div>
+
+    <div class="field">
+      <%= f.label :active %>
+      <br/>
+      <%= f.check_box :active %>
+    </div>
+    <div class="field">
+      <%= f.label :download_start %>
+      <br/>
+      <%= f.check_box :download_start %>
+    </div>
+    <div class="field">
+      <%= f.label :download_finish %>
+      <br/>
+      <%= f.check_box :download_finish %>
+    </div>
+    <div class="actions">
+      <%= f.submit %>
+    </div>
 <% end %>

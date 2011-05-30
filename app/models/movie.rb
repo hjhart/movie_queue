@@ -23,6 +23,14 @@ class Movie < ActiveRecord::Base
       return false
     end
 
+    # check filename to see if it's parsable
+    begin
+      URI.parse(result.link)
+    rescue
+      puts "The URL was unparsable, so we're skipping it. #{result.link}"
+      return false
+    end
+
     true
   end
 
@@ -30,12 +38,16 @@ class Movie < ActiveRecord::Base
     match = filesize.match(/([\d.]+)(.*)/i)
     if match
       raw_size = match[1].to_f
-      
+
       case match[2].strip
-        when /GiB/i then raw_size * 1000000000
-        when /MiB/i then raw_size * 1000000
-        when /KiB/i then raw_size * 1000
-        else nil
+        when /GiB/i then
+          raw_size * 1000000000
+        when /MiB/i then
+          raw_size * 1000000
+        when /KiB/i then
+          raw_size * 1000
+        else
+          nil
       end
     else
       nil
@@ -47,11 +59,23 @@ class Movie < ActiveRecord::Base
     Movie.all(:conditions => {:download_start => false})
   end
 
+  def eligible_files
+    movie = Movie.find(id)
+    if (movie.name)
+      search = PirateBay::Search.new(movie.name)
+      if results = search.execute
+        filtered_results = results.select { |r| Movie.qualifies r }
+      end
+    end
+    filtered_results
+  end
+
   def self.perform(id)
     movie = Movie.find(id)
     if (movie.name)
       search = PirateBay::Search.new(movie.name)
       if results = search.execute
+        puts "Received #{results.size} results from PirateBay"
         download_link = nil
         results.each do |result|
           if Movie.qualifies result
@@ -62,7 +86,7 @@ class Movie < ActiveRecord::Base
         if download_link
           d = Download.create(:url => download_link, :movie => movie, :status => Download::NEW)
           d.download
-          movie.update_attributes({ :download_start => true })
+          movie.update_attributes({:download_start => true})
         else
           raise Exception.new("Retrieved search results, but none passed the requirements to download.")
         end
@@ -76,5 +100,13 @@ class Movie < ActiveRecord::Base
     Movie.unqueued.each do |movie|
       Movie.perform(movie.id)
     end
+  end
+
+  def self.get_movie_list(movie_name)
+    include RottenTomatoes
+
+    Rotten.api_key = 'z2s2hk9pm7zw3zubd5mrbk2m'
+    movies = RottenMovie.find(:title => movie_name, :limit => 10)
+    movies.map {|movie| "#{movie.title} (#{movie.year})" }
   end
 end
