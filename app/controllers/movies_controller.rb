@@ -2,7 +2,8 @@ class MoviesController < ApplicationController
   # GET /movies
   # GET /movies.json
   def list
-    @movies = Movie.get_movie_list(params[:q])
+    query = params[:q] || params[:term]
+    @movies = Movie.get_movie_list(query)
     render json: @movies 
   end
 

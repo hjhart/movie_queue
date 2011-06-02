@@ -3,3 +3,53 @@
   They will automatically be included in application.css.
   You can use Sass (SCSS) here: http://sass-lang.com/
 */
+
+$background-color: #000030;
+$neon-green: #4a9f00;
+body {
+    padding: 2em 6em;
+    background-image: url('/assets/background.jpg');
+    background-repeat: no-repeat;
+    background-color: $background-color;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Century Gothic";
+    font-weight: normal;
+}
+
+h1 {
+    font-size: 52px;
+}
+
+.add_movie {
+    font-family: "Century Gothic";
+    font-size: 46px;
+    &:link, &:visited {
+    color: white;
+    text-decoration: none;
+    float: right;
+    }
+}
+
+.plus {
+    &:link, &:visited {
+    color: $neon-green;
+    }
+}
+
+.index {
+    h1 {
+        float: left;
+        padding: 0; margin: 0;
+    }
+    table {
+        width: 100%;
+        td:nth-child(2), td:nth-child(3) {
+            width: 36px;
+        }
+        th {
+            text-align: left;
+        }
+    }
+}

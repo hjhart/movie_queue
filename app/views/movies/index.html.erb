@@ -1,29 +1,42 @@
-<h1>Listing movies</h1>
+<%# TODO: Scope out the names to the appropriate tables %>
+<%# TODO: Check movie release date after adding (add to resque queue) %>
 
+<h1>Movie Queue</h1>
+<%= link_to '+', new_movie_path, :class => "plus add_movie" %><%= link_to 'Movie', new_movie_path, :class => "add_movie" %>
+<br />
+<br />
+
+<h2>Ready to Watch</h2>
 <table>
-  <tr>
-    <th>Name</th>
-    <th>Active</th>
-    <th>Download start</th>
-    <th>Download finish</th>
-    <th></th>
-    <th></th>
-    <th></th>
-  </tr>
-
-<% @movies.each do |movie| %>
+<% Movie.ready.each do |movie| %>
   <tr>
     <td><%= movie.name %></td>
-    <td><%= movie.active %></td>
-    <td><%= movie.download_start %></td>
-    <td><%= movie.download_finish %></td>
-    <td><%= link_to 'Show', movie %></td>
-    <td><%= link_to 'Edit', edit_movie_path(movie) %></td>
-    <td><%= link_to 'Destroy', movie, confirm: 'Are you sure?', method: :delete %></td>
+    <td><%= link_to image_tag("/assets/pencil.png", :border=>0), edit_movie_path(movie) %></td>
+    <td><%= link_to image_tag("/assets/ex.png", :border=>0), movie, confirm: 'Are you sure?', method: :delete %></td>
   </tr>
 <% end %>
 </table>
 
-<br />
+<h2>Downloading</h2>
+<table>
+<% Movie.downloading.each do |movie| %>
+  <tr>
+    <td><%= movie.name %></td>
+    <td><%= link_to image_tag("/assets/pencil.png", :border=>0), edit_movie_path(movie) %></td>
+    <td><%= link_to image_tag("/assets/ex.png", :border=>0), movie, confirm: 'Are you sure?', method: :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<h2>In Theatres</h2>
+<table>
+<% Movie.in_theatres.each do |movie| %>
+  <tr>
+    <td><%= movie.name %></td>
+    <td><%= link_to image_tag("/assets/pencil.png", :border=>0), edit_movie_path(movie) %></td>
+    <td><%= link_to image_tag("/assets/ex.png", :border=>0), movie, confirm: 'Are you sure?', method: :delete %></td>
+  </tr>
+<% end %>
+</table>
 
 <%= link_to 'New Movie', new_movie_path %>

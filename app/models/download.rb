@@ -13,7 +13,7 @@ class Download < ActiveRecord::Base
 
     file = download_torrent_file
 
-    results = `open -a /Applications/uTorrent.app #{file} 2>&1`
+    results = `open -a /Applications/Transmission.app #{file} 2>&1`
     if $?.success?
       self.status = Download::OPENED
       save!

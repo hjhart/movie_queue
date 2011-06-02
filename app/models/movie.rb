@@ -3,12 +3,17 @@ require 'pirate_bay'
 
 class Movie < ActiveRecord::Base
 
+  scope :in_theatres, :conditions => {:active => true}
+  scope :ready, :conditions => {:download_start => true, :download_finish => true}
+  scope :downloading, :conditions => {:download_start => true, :download_finish => false}
+
   MINIMUM_SEEDS = 10
   MAX_FILE_SIZE = 1000000000 # in bytes
   MIN_FILE_SIZE = 400000000
 
   def self.qualifies(result)
     # TODO: Specifying categories?
+    # TODO: Delayed queue - add movies to queue.
 
     # check min seeds
     if result.seeds < MINIMUM_SEEDS

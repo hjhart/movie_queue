@@ -1,9 +1,11 @@
-body { background-color: #fff; color: #333; }
 
 body, p, ol, ul, td {
-  font-family: verdana, arial, helvetica, sans-serif;
-  font-size:   13px;
-  line-height: 18px;
+    font-family: 'HelveticaNeue-UltraLight', 'Helvetica Neue UltraLight', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    font-size: 24px;
+    font-weight: 100;
+    letter-spacing: 1px;
+  line-height: 1.5em;
+  color: white;
 }
 
 pre {
