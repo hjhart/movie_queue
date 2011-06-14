@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110609070722) do
+ActiveRecord::Schema.define(:version => 20110614063948) do
 
   create_table "downloads", :force => true do |t|
     t.string   "url"
@@ -43,6 +43,13 @@ ActiveRecord::Schema.define(:version => 20110609070722) do
     t.integer  "critics_score"
     t.integer  "runtime"
     t.string   "search_term"
+  end
+
+  create_table "notifications", :force => true do |t|
+    t.string   "notification"
+    t.boolean  "read"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
 end

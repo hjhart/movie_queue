@@ -9,6 +9,7 @@
 //= require jquery_ujs
 //= require_tree .
 
+var openNotifications = []
 
 $(document).ready(function() {
 //function(request, response) {
@@ -45,6 +46,11 @@ $(document).ready(function() {
 //        }
     });
 
+    setInterval(function() {
+        queryNotifications()
+    }, 5000)
+
+
     $('input[value="rtfetch"]').click(function(e) {
         e.preventDefault();
         select = $('select[name="movie[name]"]')
@@ -67,3 +73,57 @@ $(document).ready(function() {
         });
     })
 })
+
+function noop() {
+    return false;
+}
+
+function createNotificationDiv(id, text) {
+    notification_holder = $("#notice")
+    notification = $("<div>")
+    notification.addClass("notification")
+    notification.attr({
+        display: 'none',
+        id: id
+    })
+    notification.html(text)
+
+    hide_link = $("<a>")
+    hide_link.attr({
+        href: "javascript:noop()"
+    })
+    hide_link.html("[X]")
+    hide_link.click(function(e) {
+        console.debug("Posting to notification/read")
+        e.preventDefault()
+        $.ajax({
+            url: "notifications/" + id + "/read",
+            success: function(data) {
+                console.debug("Successfully posted to notification/read")
+                $('.notification#' + id).fadeOut()
+            }
+        })
+    })
+
+    notification.append(hide_link)
+    notification_holder.append(notification)
+    notification.fadeIn()
+    openNotifications.push(id)
+    console.debug("Updated openNotifications", openNotifications)
+}
+
+function queryNotifications() {
+    $.ajax({
+        url: "/notifications/poll",
+        success: function(data) {
+            if (data.length > 0) {
+                $.each(data, function(index, notification) {
+                    if (openNotifications.indexOf(notification.id) < 0) {
+                        createNotificationDiv(notification.id, notification.notification)
+                    }
+                })
+            }
+
+        }
+    })
+}
