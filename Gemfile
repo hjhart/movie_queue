@@ -15,8 +15,9 @@ gem 'uglifier'
 gem 'jquery-rails'
 gem 'nokogiri'
 gem 'rottentomatoes'
-gem 'transmission-simple'
-
+gem 'resque'
+gem 'transmission-client'
+gem 'bencode'
 
 # Use unicorn as the web server
 # gem 'unicorn'
@@ -26,6 +27,10 @@ gem 'transmission-simple'
 
 # To use debugger
 # gem 'ruby-debug19', :require => 'ruby-debug'
+
+group :development do
+  gem 'awesome_print'
+end
 
 group :test do
   # Pretty printed test output

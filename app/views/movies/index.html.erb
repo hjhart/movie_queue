@@ -1,5 +1,6 @@
 <%# TODO: Scope out the names to the appropriate tables %>
 <%# TODO: Check movie release date after adding (add to resque queue) %>
+<p id="notice"><%= notice %></p>
 
 <h1>Movie Queue</h1>
 <%= link_to '+', new_movie_path, :class => "plus add_movie" %><%= link_to 'Movie', new_movie_path, :class => "add_movie" %>
@@ -20,21 +21,29 @@
 <h2>Downloading</h2>
 <table>
 <% Movie.downloading.each do |movie| %>
+      <script type="text/javascript">
+        $(document).ready(function() {
+            $(".status_bar#<%= movie.id %>").progressbar({ value: <%= movie.percent_complete %> });
+        })
+      </script>
   <tr>
-    <td><%= movie.name %></td>
+    <td><%= movie.name %> (<%= movie.year %>)</td>
+    <td class="eta"><%= movie.display_eta %></td>
+    <td><div class="status_bar" id="<%= movie.id %>"</td>
     <td><%= link_to image_tag("/assets/pencil.png", :border=>0), edit_movie_path(movie) %></td>
     <td><%= link_to image_tag("/assets/ex.png", :border=>0), movie, confirm: 'Are you sure?', method: :delete %></td>
   </tr>
 <% end %>
 </table>
 
-<h2>In Theatres</h2>
+<h2>Queued</h2>
 <table>
-<% Movie.in_theatres.each do |movie| %>
+<% Movie.queued.each do |movie| %>
   <tr>
-    <td><%= movie.name %></td>
+    <td><%= movie.search_term %> <%= movie.queue_date %></td>
     <td><%= link_to image_tag("/assets/pencil.png", :border=>0), edit_movie_path(movie) %></td>
     <td><%= link_to image_tag("/assets/ex.png", :border=>0), movie, confirm: 'Are you sure?', method: :delete %></td>
+    <td><%= link_to image_tag("/assets/download.png", :border=>0), "movie/#{movie.id}/download" %></td>
   </tr>
 <% end %>
 </table>

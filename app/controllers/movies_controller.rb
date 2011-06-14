@@ -47,13 +47,19 @@ class MoviesController < ApplicationController
     @movie = Movie.find(params[:id])
   end
 
+  def download
+    @movie = Movie.find(params[:id])
+    Resque.enqueue(Movie, @movie.id)
+    redirect_to movies_url, notice: "Attempting to download the movie #{@movie.name}"
+  end
+
   # POST /movies
   # POST /movies.json
   def create
     @movie = Movie.new(params[:movie])
-
     respond_to do |format|
       if @movie.save
+        Resque.enqueue(Movie, @movie.id)
         format.html { redirect_to @movie, notice: 'Movie was successfully created.' }
         format.json { render json: @movie, status: :created, location: @movie }
       else
@@ -70,6 +76,7 @@ class MoviesController < ApplicationController
 
     respond_to do |format|
       if @movie.update_attributes(params[:movie])
+        Resque.enqueue(Movie, @movie.id)
         format.html { redirect_to @movie, notice: 'Movie was successfully updated.' }
         format.json { head :ok }
       else

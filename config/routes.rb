@@ -2,7 +2,7 @@ MovieQueue::Application.routes.draw do
   resources :movies
   root :to => 'movies#index'
   match 'movielist.json' => 'movies#list'
-
+  match 'movie/:id/download' => 'movies#download'
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

@@ -1,15 +1,33 @@
+# TODO: IS it possible to download the files from tpb that have square braackets? URI.parse doesn't work with 'em.
+# TODO: Consider 404 messages from TPB
+# TODO: TPB gem should only be searching for movies
+# TODO: Can we implement music for this as well?
+# TODO: Integrated torrent application using ruby-torrent
+# TODO: Streaming via ffmpeg
+# TODO: Notifications that a resque queue completed but failed. "Push notifications"
+
 require 'rubygems'
 require 'pirate_bay'
 
 class Movie < ActiveRecord::Base
 
-  scope :in_theatres, :conditions => {:active => true}
-  scope :ready, :conditions => {:download_start => true, :download_finish => true}
-  scope :downloading, :conditions => {:download_start => true, :download_finish => false}
+  @queue = 'movie_queue'
 
-  MINIMUM_SEEDS = 10
+  scope :queued, :conditions => {:download_start => nil}
+  scope :ready, :conditions => {:download_start => true, :download_finish => true}
+  scope :downloading, :conditions => {:download_start => true, :download_finish => nil}
+
+  has_many :downloads
+  
+  MINIMUM_SEEDS = 5
   MAX_FILE_SIZE = 1000000000 # in bytes
   MIN_FILE_SIZE = 400000000
+
+  def queue_date
+    return "(In Theatres)" if self.dvd_release_date.nil?
+    return "(#{self.year})" if (Date.today > self.dvd_release_date)
+    return "(Comes out #{self.dvd_release_date})" if self.dvd_release_date
+  end
 
   def self.qualifies(result)
     # TODO: Specifying categories?
@@ -39,6 +57,75 @@ class Movie < ActiveRecord::Base
     true
   end
 
+  def percent_complete
+    percent = downloads.first.percent_done
+    return 0 if percent.nil?
+    percent
+  end
+
+  def display_eta
+    eta = downloads.first.eta
+    return nil if(eta.nil?)
+    eta_in_seconds = eta.to_i
+
+    display_eta = case
+      when eta_in_seconds == -1
+        "Done"
+      when eta_in_seconds < 60
+        "< 1 min"
+      when eta_in_seconds > 60 && eta_in_seconds < 3600
+        "#{(eta_in_seconds / 60).to_i} mins"
+      when eta_in_seconds
+        "#{(eta_in_seconds / 3600).to_i} hr #{(eta_in_seconds / 60) % 60} mins"
+      else
+        "n/a"
+    end
+  end
+
+  def self.perform(id)
+    movie = Movie.find(id)
+    include RottenTomatoes
+    Rotten.api_key = 'z2s2hk9pm7zw3zubd5mrbk2m'
+
+    puts "Searching Rotten Tomatoes API for movie #{movie.search_term}"
+
+    result = RottenMovie.find(:title => movie.search_term, :expand_results => true, :limit => 1)
+
+    if result
+      ap result
+      release_date = result.release_dates.dvd
+
+      puts "Received results for movie #{result.title}"
+      movie.update_attributes({
+         :name => result.title,
+         :dvd_release_date => result.release_dates.dvd,
+         :year => result.year,
+         :mpaa_rating => result.mpaa_rating,
+         :thumbnail_url => result.posters.detailed,
+         :url => result.links.alternate,
+         :audience_score => result.ratings.audience_score,
+         :critics_score => result.ratings.critics_score,
+         :runtime => result.runtime,
+      })
+
+      if(release_date)
+
+        if (Date.today + 1.week) > Date.parse(release_date) # movies are usually released a little bit ahead of their time
+          Resque.enqueue(Torrent, id)
+          puts "Enqueued the torrent"
+        else
+          puts "The movie hasn't been released yet. Will not enqueue the download."
+          # TODO: Figure out how to enqueue this one. Schedule it on a date. Or just every night at midnight.
+        end
+      else
+        puts "The movie didn't have a DVD release date listed. It's probably still in theatres."
+      end
+    else
+      puts "No results were found from Rotten Tomato API."
+    end
+
+  end
+
   def self.filesize_in_bytes(filesize)
     match = filesize.match(/([\d.]+)(.*)/i)
     if match
@@ -60,14 +147,10 @@ class Movie < ActiveRecord::Base
 
   end
 
-  def self.unqueued
-    Movie.all(:conditions => {:download_start => false})
-  end
-
   def eligible_files
     movie = Movie.find(id)
     if (movie.name)
-      search = PirateBay::Search.new(movie.name)
+      search = PirateBay::Search.new(movie.search_term)
       if results = search.execute
         filtered_results = results.select { |r| Movie.qualifies r }
       end
@@ -75,34 +158,9 @@ class Movie < ActiveRecord::Base
     filtered_results
   end
 
-  def self.perform(id)
-    movie = Movie.find(id)
-    if (movie.name)
-      search = PirateBay::Search.new(movie.name)
-      if results = search.execute
-        puts "Received #{results.size} results from PirateBay"
-        download_link = nil
-        results.each do |result|
-          if Movie.qualifies result
-            download_link = result.link
-            break
-          end
-        end
-        if download_link
-          d = Download.create(:url => download_link, :movie => movie, :status => Download::NEW)
-          d.download
-          movie.update_attributes({:download_start => true})
-        else
-          raise Exception.new("Retrieved search results, but none passed the requirements to download.")
-        end
-      else
-        raise Exception.new("The search to pirate bay for #{movie.name} returned no results. Try again later.")
-      end
-    end
-  end
 
   def self.enqueue_all
-    Movie.unqueued.each do |movie|
+    Movie.queued.each do |movie|
       Movie.perform(movie.id)
     end
   end
@@ -112,6 +170,6 @@ class Movie < ActiveRecord::Base
 
     Rotten.api_key = 'z2s2hk9pm7zw3zubd5mrbk2m'
     movies = RottenMovie.find(:title => movie_name, :limit => 10)
-    movies.map {|movie| "#{movie.title} (#{movie.year})" }
+    movies.map { |movie| "#{movie.title} (#{movie.year})" }
   end
 end

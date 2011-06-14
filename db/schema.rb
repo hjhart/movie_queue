@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110529235457) do
+ActiveRecord::Schema.define(:version => 20110609070722) do
 
   create_table "downloads", :force => true do |t|
     t.string   "url"
@@ -18,6 +18,13 @@ ActiveRecord::Schema.define(:version => 20110529235457) do
     t.integer  "status"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "percent_done"
+    t.integer  "filesize"
+    t.datetime "date_created"
+    t.string   "download_name"
+    t.string   "hash"
+    t.integer  "eta"
+    t.integer  "torrent_id"
   end
 
   create_table "movies", :force => true do |t|
@@ -27,6 +34,15 @@ ActiveRecord::Schema.define(:version => 20110529235457) do
     t.boolean  "download_finish"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.date     "dvd_release_date"
+    t.string   "year"
+    t.string   "mpaa_rating"
+    t.string   "thumbnail_url"
+    t.string   "url"
+    t.integer  "audience_score"
+    t.integer  "critics_score"
+    t.integer  "runtime"
+    t.string   "search_term"
   end
 
 end

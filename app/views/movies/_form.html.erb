@@ -11,9 +11,9 @@
     <% end %>
 
     <div class="field">
-      <%= f.label :name %>
+      <%= f.label :search_term %>
       <br/>
-      <%= f.text_field :name %><%= submit_tag("rtfetch") %>
+      <%= f.text_field :search_term %><%= submit_tag("rtfetch") %>
     </div>
 
     <div class="field">
@@ -22,21 +22,6 @@
       <%= f.select(:name, ['Enter your query to get a list of movies'], {}, :disabled => true) %>
     </div>
 
-    <div class="field">
-      <%= f.label :active %>
-      <br/>
-      <%= f.check_box :active %>
-    </div>
-    <div class="field">
-      <%= f.label :download_start %>
-      <br/>
-      <%= f.check_box :download_start %>
-    </div>
-    <div class="field">
-      <%= f.label :download_finish %>
-      <br/>
-      <%= f.check_box :download_finish %>
-    </div>
     <div class="actions">
       <%= f.submit %>
     </div>

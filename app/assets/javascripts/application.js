@@ -45,11 +45,10 @@ $(document).ready(function() {
 //        }
     });
 
-
     $('input[value="rtfetch"]').click(function(e) {
         e.preventDefault();
         select = $('select[name="movie[name]"]')
-        input = $('input[name="movie[name]"]')
+        input = $('input[name="movie[search_term]"]')
         query = input.val()
 
         $.ajax({
@@ -64,7 +63,6 @@ $(document).ready(function() {
                 console.debug(selects)
                 select.html(selects)
                 select.removeAttr("disabled")
-                input.attr("disabled", "true")
             }
         });
     })
