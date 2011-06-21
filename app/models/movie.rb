@@ -18,7 +18,7 @@ class Movie < ActiveRecord::Base
   scope :downloading, :conditions => {:download_start => true, :download_finish => nil}
 
   has_many :downloads
-  
+
   MINIMUM_SEEDS = 5
   MAX_FILE_SIZE = 1000000000 # in bytes
   MIN_FILE_SIZE = 400000000
@@ -65,7 +65,7 @@ class Movie < ActiveRecord::Base
 
   def display_eta
     eta = downloads.first.eta
-    return nil if(eta.nil?)
+    return nil if (eta.nil?)
     eta_in_seconds = eta.to_i
 
     seconds_to_string(eta_in_seconds)
@@ -88,59 +88,62 @@ class Movie < ActiveRecord::Base
 
   def self.perform(id)
     movie = Movie.find(id)
-    include RottenTomatoes
-    Rotten.api_key = 'z2s2hk9pm7zw3zubd5mrbk2m'
 
-    puts "Searching Rotten Tomatoes API for movie #{movie.search_term}"
+    unless movie.api_queried
 
-    result = RottenMovie.find(:title => movie.search_term, :expand_results => true, :limit => 1)
+      include RottenTomatoes
+      Rotten.api_key = 'z2s2hk9pm7zw3zubd5mrbk2m'
 
-    if result
-      ap result
-      release_date = result.release_dates.dvd
+      puts "Searching Rotten Tomatoes API for movie #{movie.search_term}"
 
-      puts "Received results for movie #{result.title}"
-      movie.update_attributes({
-         :name => result.title,
-         :dvd_release_date => result.release_dates.dvd,
-         :year => result.year,
-         :mpaa_rating => result.mpaa_rating,
-         :thumbnail_url => result.posters.detailed,
-         :url => result.links.alternate,
-         :audience_score => result.ratings.audience_score,
-         :critics_score => result.ratings.critics_score,
-         :runtime => result.runtime,
-      })
+      result = RottenMovie.find(:title => movie.search_term, :expand_results => true, :limit => 1)
 
-      if(release_date)
-
-        if (Date.today + 1.week) > Date.parse(release_date) # movies are usually released a little bit ahead of their time
-          Resque.enqueue(Torrent, id)
-          puts "Enqueued the torrent"
-        else
-          puts "The movie hasn't been released yet. Will not enqueue the download."
-          # TODO: Figure out how to enqueue this one. Schedule it on a date. Or just every night at midnight.
-        end
+      if result
+        Notification.create(:notification => "Received results for movie #{result.title}. Click <a href='/movie/#{id}'>here</a> if you'd like to view/edit.", :read => false)
+        movie.update_attributes({
+            :name => result.title,
+            :dvd_release_date => result.release_dates.dvd,
+            :year => result.year,
+            :mpaa_rating => result.mpaa_rating,
+            :thumbnail_url => result.posters.detailed,
+            :url => result.links.alternate,
+            :audience_score => result.ratings.audience_score,
+            :critics_score => result.ratings.critics_score,
+            :runtime => result.runtime,
+            :api_queried => true
+        })
       else
-        puts "The movie didn't have a DVD release date listed. It's probably still in theatres."
+        puts "No results were found from Rotten Tomato API."
+      end
+    end
+
+    if (movie.dvd_release_date)
+      if (Date.today + 1.week) > movie.dvd_release_date # movies are usually released a little bit ahead of their time
+        Resque.enqueue(Torrent, id)
+        puts "Enqueued the torrent"
+      else
+        puts "The movie hasn't been released yet. Will not enqueue the download."
+        # TODO: Figure out how to enqueue this one. Schedule it on a date. Or just every night at midnight.
       end
     else
-      puts "No results were found from Rotten Tomato API."
+      puts "The movie didn't have a DVD release date listed. It's probably still in theatres."
     end
+
 
   end
 
   def self.filesize_in_bytes(filesize)
-    match = filesize.match(/([\d.]+)(.*)/i)
+    match = filesize.match(/([\d.]+)(.*)/)
+
     if match
       raw_size = match[1].to_f
 
       case match[2].strip
-        when /GiB/i then
+        when /gib/i then
           raw_size * 1000000000
-        when /MiB/i then
+        when /mib/i then
           raw_size * 1000000
-        when /KiB/i then
+        when /kib/i then
           raw_size * 1000
         else
           nil
@@ -171,9 +174,10 @@ class Movie < ActiveRecord::Base
 
   def self.get_movie_list(movie_name)
     include RottenTomatoes
-
     Rotten.api_key = 'z2s2hk9pm7zw3zubd5mrbk2m'
+
     movies = RottenMovie.find(:title => movie_name, :limit => 10)
     movies.map { |movie| "#{movie.title} (#{movie.year})" }
   end
+
 end
