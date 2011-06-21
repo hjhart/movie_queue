@@ -5,9 +5,11 @@ class Download < ActiveRecord::Base
   OPENED = 1
   DOWNLOADING = 2
   COMPLETED = 3
+  OPTIONAL = 98
   FAILED = 99
 
   belongs_to :movie
+  
   @queue = :update_download_percent
 
   def self.perform()
@@ -97,6 +99,7 @@ class Download < ActiveRecord::Base
 
         t.on_torrent_removed do |torrent|
           puts "Darn torrent deleted."
+          Notification.create(:notification => "The torrent was removed from transmission: #{torrent.name}")
           download = Download.find_by_torrent_id(torrent.id)
           if download
             puts "Found the deleted torrent. Deleteing appropriately."
@@ -135,6 +138,7 @@ class Download < ActiveRecord::Base
 
     open_file = File.open(file, 'rb')
     content = open_file.read
+    ap content
     decoded_torrent = BEncode.load(content)
     self.filesize = decoded_torrent["info"]["length"]
     self.hash = decoded_torrent["info"]["sha1"]

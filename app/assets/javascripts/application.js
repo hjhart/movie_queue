@@ -12,38 +12,12 @@
 var openNotifications = []
 
 $(document).ready(function() {
-//function(request, response) {
-//            console.debug("Request term", request.term)
-//            console.debug("Response", response)
-//
-//            $.ajax({
-//                url: "/movielist.json",
-//                dataType: "jsonp",
-//                data: {
-//                    q: request.term
-//                },
-//                success: function(data) {
-//                    console.debug(data)
-//                    response($.each(data);
-//                }
-//            });
-//        }
     $("input[id=movie_adder]").autocomplete({
-//        source: ["shrek 1", "shrek 2", "shrek 3"],
         source: "/movielist.json" + $("input[id=movie_adder]").val(),
-//        source: "/movielist.json?q=shrek",
         minLength: 2,
-//        select: function(event, ui) {
-//            console.debug(ui.item ?
-//                    "Selected: " + ui.item.label :
-//                    "Nothing selected, input was " + this.value);
-//        },
         open: function() {
             console.debug($(this).val())
         }
-//        close: function() {
-//            $(this).removeClass("ui-corner-top").addClass("ui-corner-all");
-//        }
     });
 
     setInterval(function() {

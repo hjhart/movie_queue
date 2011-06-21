@@ -1,0 +1,7 @@
+<% @movie.downloads.each do |d|  %>
+<p>
+Name: <%= d.download_name %><br/>
+Url: <%= d.url %><br/>
+Download: <%= movie_download_url  @movie, d %>
+</p>
+<% end %>

@@ -1,7 +1,10 @@
 MovieQueue::Application.routes.draw do
   match 'notifications/poll' => 'notifications#poll'
   match 'notifications/:id/read' => 'notifications#read'
-  resources :movies
+  resources :movies do
+    resources :downloads
+  end
+
   root :to => 'movies#index'
   match 'movielist.json' => 'movies#list'
   match 'movie/:id/download' => 'movies#download'

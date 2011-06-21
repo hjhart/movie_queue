@@ -12,3 +12,7 @@
     height: 0.5em;
     margin-right: 20px;
 }
+
+a:link, a:visited {
+    color: white;
+}

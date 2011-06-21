@@ -68,15 +68,19 @@ class Movie < ActiveRecord::Base
     return nil if(eta.nil?)
     eta_in_seconds = eta.to_i
 
-    display_eta = case
-      when eta_in_seconds == -1
+    seconds_to_string(eta_in_seconds)
+  end
+
+  def seconds_to_string(seconds)
+    case
+      when seconds == -1
         "Done"
-      when eta_in_seconds < 60
+      when seconds < 60
         "< 1 min"
-      when eta_in_seconds > 60 && eta_in_seconds < 3600
-        "#{(eta_in_seconds / 60).to_i} mins"
-      when eta_in_seconds
-        "#{(eta_in_seconds / 3600).to_i} hr #{(eta_in_seconds / 60) % 60} mins"
+      when seconds > 60 && seconds < 3600
+        "#{(seconds / 60).to_i} mins"
+      when seconds >= 3600
+        "#{(seconds / 3600).to_i} hr #{(seconds / 60) % 60} mins"
       else
         "n/a"
     end

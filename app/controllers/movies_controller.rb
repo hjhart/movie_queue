@@ -60,11 +60,9 @@ class MoviesController < ApplicationController
     respond_to do |format|
       if @movie.save
         Resque.enqueue(Movie, @movie.id)
-        format.html { redirect_to @movie, notice: 'Movie was successfully created.' }
-        format.json { render json: @movie, status: :created, location: @movie }
+        format.html { redirect_to movies_path, notice: 'Movie was successfully created.' }
       else
         format.html { render action: "new" }
-        format.json { render json: @movie.errors, status: :unprocessable_entity }
       end
     end
   end

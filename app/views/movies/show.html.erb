@@ -1,25 +1,26 @@
-<p id="notice"><%= notice %></p>
-
-<p>
-  <b>Name:</b>
-  <%= @movie.name %>
-</p>
-
-<p>
-  <b>Active:</b>
-  <%= @movie.active %>
-</p>
-
-<p>
-  <b>Download start:</b>
-  <%= @movie.download_start %>
-</p>
-
-<p>
-  <b>Download finish:</b>
-  <%= @movie.download_finish %>
-</p>
-
-
-<%= link_to 'Edit', edit_movie_path(@movie) %> |
-<%= link_to 'Back', movies_path %>
+<strong><%= @movie.name %></strong> (<%= @movie.year %>)
+<table>
+  <tr>
+    <td rowspan="6"><img src="<%= @movie.thumbnail_url %>" alt="Rotten Tomatoes thumb for <%= @movie.name %>"/></td>
+  </tr>
+  <tr>
+    <td><strong>Search Term:</strong></td>
+    <td><%= @movie.search_term %></td>
+  </tr>
+  <tr>
+    <td>Rating</td>
+    <td><%= @movie.mpaa_rating %></td>
+  </tr>
+  <tr>
+    <td><strong>Critics Score:</strong></td>
+    <td><%= @movie.critics_score %></td>
+  </tr>
+  <tr>
+    <td><strong>Audience Score:</strong></td>
+    <td><%= @movie.audience_score %></td>
+  </tr>
+  <tr>
+    <td><strong>Movie Length:</strong></td>
+    <td><%= @movie.seconds_to_string(@movie.runtime * 60) %></td>
+  </tr>
+</table>
