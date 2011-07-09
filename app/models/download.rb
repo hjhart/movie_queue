@@ -9,117 +9,10 @@ class Download < ActiveRecord::Base
   FAILED = 99
 
   belongs_to :movie
-  
+
   @queue = :update_download_percent
 
   def self.perform()
-
-    begin
-      EventMachine.run do
-#      Everytime we restart transmission we lose the uniqueness of tor.id
-#      If we pause the torrent, the tor.startDate changes to be newer.
-#      If we restart transmission we probably get a new startDate as well.
-
-        t = Transmission::Client.new
-
-        EM.add_periodic_timer(5) do
-          t.torrents do |torrents|
-            torrents.each do |tor|
-              if (tor.eta > -1)
-                download_range = (Time.at(tor.startDate) - 20.seconds)..(Time.at(tor.startDate) + 20.seconds)
-                download = Download.where(:created_at => download_range)
-
-                if (download.size == 0)
-                  puts "The torrent was not found based on startDate. Searching by torrent_id: #{tor.id}"
-                  download = Download.where(:torrent_id => tor.id, :status => Download::DOWNLOADING)
-                  if (download.size == 1)
-                    puts "The torrent was found based on torrent_id. Updated startDate."
-                    d = download.first
-                    d.created_at = Time.at(tor.startDate)
-                    d.save!
-                  end
-                end
-
-                if (download.size > 1)
-                  raise "The downloads were performed too closely together, or your range is too wide. Debug at this point"
-                elsif (download.size == 1)
-                  download = download.first
-                  download.percent_done = (tor.percentDone * 100).to_i
-                  download.eta = tor.eta
-                  download.status = Download::DOWNLOADING
-                  download.torrent_id = tor.id
-                  download.save!
-                  puts "Updated attributes for #{tor.name} on Download #{download.id} #{download.download_name}"
-                else
-                  puts "No download found. :("
-                end
-              else
-                "The torrent is complete. Do you want to remove it?"
-              end
-#         tor.status == 8 when seeding, methinks.
-#          TODO: Option to remove torrent file when it's completed.'
-            end
-          end
-        end
-
-        t.on_download_finished do |torrent|
-          download = Download.find_by_torrent_id(torrent.id)
-          download.percent_done = 100
-          download.eta = 0
-          download.status = Download::COMPLETED
-          download.torrent_id = -1
-          download.save!
-          puts "Completed download. Updated attributes for #{torrent.name} on Download #{download.id} #{download.download_name}"
-
-          movie = download.movie
-          movie.download_finish = true
-          movie.save!
-
-          # TODO: Integrate the movie renaming scheme on this directory
-
-          t.remove(torrent.id)
-        end
-
-        t.on_torrent_stopped do |torrent|
-          puts "Oooh torrent stopped"
-        end
-
-        t.on_torrent_started do |tor|
-          puts "Torrent started."
-          download_range = (90.seconds.ago)..(Time.now)
-          download = Download.find_by_created_at(download_range)
-          if download
-            download.torrent_id = tor.id
-            download.save!
-            puts "Found a download, updating transmission ID. #{download.download_name}"
-          else
-            puts "Didn't find a download. Try again."
-          end
-        end
-
-        t.on_torrent_removed do |torrent|
-          puts "Darn torrent deleted."
-          Notification.create(:notification => "The torrent was removed from transmission: #{torrent.name}")
-          download = Download.find_by_torrent_id(torrent.id)
-          if download
-            puts "Found the deleted torrent. Deleteing appropriately."
-            download.movie.delete
-            download.delete
-          else
-            puts "Did not find the download by ID. Searching by started date."
-            download_range = (Time.at(torrent.startDate) - 20.seconds)..(Time.at(torrent.startDate) + 20.seconds)
-            download = Download.where(:created_at => download_range)
-            if download
-              puts "Found the deleted torrent by start date. Deleting appropriately."
-              download.movie.delete
-              download.delete
-            end
-          end
-        end
-      end
-    rescue RuntimeError
-      puts "Transmission is no longer open. Can we do anything?"
-    end
   end
 
   def start_download(file)
@@ -135,13 +28,19 @@ class Download < ActiveRecord::Base
   end
 
   def store_file_data(file)
+    require 'digest/sha1'
 
     open_file = File.open(file, 'rb')
     content = open_file.read
-    ap content
     decoded_torrent = BEncode.load(content)
+
+    puts "-====- " * 30
+    puts "Encoding torrent hash:"
+    puts decoded_torrent["info"].bencode
+    puts "-====- " * 30
+
     self.filesize = decoded_torrent["info"]["length"]
-    self.hash = decoded_torrent["info"]["sha1"]
+    self.hash = Digest::SHA1.hexdigest(decoded_torrent["info"].bencode)
     self.download_name = decoded_torrent["info"]["name"]
     self.date_created = Time.at(decoded_torrent["creation date"].to_i)
     puts "Storing data into download: \nLength: #{self.filesize}\nHash:#{self.hash}\nDate Created#{self.date_created}"

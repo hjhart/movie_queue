@@ -4,7 +4,6 @@ class DownloadsController < ApplicationController
   end
 
   def show
-    Notification.find_by_read(:false)
     download = Download.find(params[:id])
     download.status = Download::DOWNLOADING
     download.save
@@ -12,8 +11,6 @@ class DownloadsController < ApplicationController
     movie = download.movie
     movie.download_start=true
     movie.save
-
-
     Notification.create({:notification => "The download for '#{download.download_name} 'has begun.", :read => false})
     redirect_to root_path
   end

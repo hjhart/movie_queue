@@ -1,4 +1,5 @@
 <%= form_for(@movie) do |f| %>
+    <p id="notice"><%= notice %></p>
     <% if @movie.errors.any? %>
         <div id="error_explanation">
           <h2><%= pluralize(@movie.errors.count, "error") %> prohibited this movie from being saved:</h2>
@@ -13,7 +14,11 @@
     <div class="field">
       <%= f.label :search_term %>
       <br/>
-      <%= f.text_field :search_term %><%= submit_tag("rtfetch") %>
+      <%= f.text_field :search_term %>
+      <br/>
+      <%= submit_tag "Fetch List from Rotten Tomatoes", :name => "rtfetch", :id => "rtfetch" %>
+      <br/>
+      <%= submit_tag "Fetch torrent list", :name => "tor_fetch", :id => "tor_fetch" %>
     </div>
 
     <div class="field">

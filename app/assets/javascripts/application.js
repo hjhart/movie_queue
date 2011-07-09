@@ -12,6 +12,8 @@
 var openNotifications = []
 
 $(document).ready(function() {
+    queryNotifications()
+    
     $("input[id=movie_adder]").autocomplete({
         source: "/movielist.json" + $("input[id=movie_adder]").val(),
         minLength: 2,
@@ -24,8 +26,19 @@ $(document).ready(function() {
         queryNotifications()
     }, 5000)
 
+    $('a.download_torrent').click(function(e) {
+        e.preventDefault()
+        console.debug(this, $(this), $(this).attr('id'), this.id)
+        $.ajax({
+            url: "movie/" + this.id + "/download",
+            success: function(data) {
+                console.debug("Downloading the torrent:", data)
+            }
+        })
+    })
 
-    $('input[value="rtfetch"]').click(function(e) {
+
+    $('input[id="rtfetch"]').click(function(e) {
         e.preventDefault();
         select = $('select[name="movie[name]"]')
         input = $('input[name="movie[search_term]"]')
@@ -43,7 +56,53 @@ $(document).ready(function() {
                 console.debug(selects)
                 select.html(selects)
                 select.removeAttr("disabled")
+            },
+            error: function(data) {
+                console.debug("You failed.", data)
+                createNotificationDiv(1, "Could not communicate with Rotten Tomatoes. Are you connected to the internet?", false)
             }
+
+        });
+    })
+
+    $('input[name="tor_fetch"]').click(function(e) {
+        e.preventDefault();
+        select = $('select[name="torrent_list"]')
+        input = $('input[name="movie[search_term]"]')
+        query = input.val()
+        form_action_with_id = $(this).closest('form').attr('action').match(/\d+/)
+        if(form_action_with_id == null) {
+            createNotificationDiv(0, "You must save the movie first before getting torrents.", false)
+            return false
+        } else {
+            movie_id = form_action_with_id[0]
+        }
+
+
+
+        $.ajax({
+            url: "/torrent_list.json",
+            data: {
+                q: query,
+                m_id: movie_id
+            },
+            method: 'get',
+            success: function(data) {
+                console.debug("Data:", data)
+                select.children().remove()
+                selects = ""
+                $.each(data, function(index, element) {
+                    selects += "<option value=\"" + element + "\">" + element + "</option>"
+                })
+                console.debug(selects)
+                select.html(selects)
+                select.removeAttr("disabled")
+            },
+            error: function(data) {
+                console.debug("You failed.", data)
+                createNotificationDiv(1, "Could not communicate with Rotten Tomatoes. Are you connected to the internet?", false)
+            }
+
         });
     })
 })
@@ -52,7 +111,7 @@ function noop() {
     return false;
 }
 
-function createNotificationDiv(id, text) {
+function createNotificationDiv(id, text, sticky) {
     notification_holder = $("#notice")
     notification = $("<div>")
     notification.addClass("notification")
@@ -71,7 +130,7 @@ function createNotificationDiv(id, text) {
         console.debug("Posting to notification/read")
         e.preventDefault()
         $.ajax({
-            url: "notifications/" + id + "/read",
+            url: "/notifications/" + id + "/read",
             success: function(data) {
                 console.debug("Successfully posted to notification/read")
                 $('.notification#' + id).fadeOut()
@@ -84,6 +143,11 @@ function createNotificationDiv(id, text) {
     notification.fadeIn()
     openNotifications.push(id)
     console.debug("Updated openNotifications", openNotifications)
+
+    if(!sticky) {
+        setTimeout(function() { notification_holder.find("div#" + id).fadeOut() }, 5000);
+    }
+
 }
 
 function queryNotifications() {
@@ -93,7 +157,7 @@ function queryNotifications() {
             if (data.length > 0) {
                 $.each(data, function(index, notification) {
                     if (openNotifications.indexOf(notification.id) < 0) {
-                        createNotificationDiv(notification.id, notification.notification)
+                        createNotificationDiv(notification.id, notification.notification, notification.sticky)
                     }
                 })
             }

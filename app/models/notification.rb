@@ -4,6 +4,6 @@ class Notification < ActiveRecord::Base
   end
 
   def as_json(options = {})
-    super(:only => [:id, :notification])
+    super(:only => [:id, :notification, :sticky])
   end
 end

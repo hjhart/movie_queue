@@ -12,7 +12,12 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
+    @movies = []
+    @movies << Movie.ready
+    @movies << Movie.downloading.sort_by { |m| -(m.download.percent_done) }
+    @movies << Movie.queued
+    @movies = @movies.flatten
+    ap @movies
 
     respond_to do |format|
       format.html # index.html.erb
@@ -50,7 +55,7 @@ class MoviesController < ApplicationController
   def download
     @movie = Movie.find(params[:id])
     Resque.enqueue(Movie, @movie.id)
-    redirect_to movies_url, notice: "Attempting to download the movie #{@movie.name}"
+    render :text => "Ok"
   end
 
   # POST /movies
@@ -59,8 +64,8 @@ class MoviesController < ApplicationController
     @movie = Movie.new(params[:movie])
     respond_to do |format|
       if @movie.save
-        Resque.enqueue(Movie, @movie.id)
-        format.html { redirect_to movies_path, notice: 'Movie was successfully created.' }
+        Resque.enqueue(Movie, @movie.id, params[:movie][:name])
+        format.html { redirect_to edit_movie_url @movie }
       else
         format.html { render action: "new" }
       end
@@ -71,6 +76,18 @@ class MoviesController < ApplicationController
   # PUT /movies/1.json
   def update
     @movie = Movie.find(params[:id])
+    api_search_term = params[:movie][:name]
+
+    puts "params --------------------------"
+    ap params
+    puts "api search term -----------------"
+    puts api_search_term
+    puts "params --------------------------"
+
+    if(api_search_term)
+      @movie.update_from_api(api_search_term)
+      Notification.create(:notification => "Updated '#{@movie.search_term}' information using rotten tomatoes.")
+    end
 
     respond_to do |format|
       if @movie.update_attributes(params[:movie])
@@ -95,4 +112,6 @@ class MoviesController < ApplicationController
       format.json { head :ok }
     end
   end
+
+
 end

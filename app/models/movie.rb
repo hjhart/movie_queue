@@ -8,6 +8,7 @@
 
 require 'rubygems'
 require 'pirate_bay'
+include RottenTomatoes
 
 class Movie < ActiveRecord::Base
 
@@ -17,13 +18,15 @@ class Movie < ActiveRecord::Base
   scope :ready, :conditions => {:download_start => true, :download_finish => true}
   scope :downloading, :conditions => {:download_start => true, :download_finish => nil}
 
-  has_many :downloads
+  has_one :download
+  has_many :torrents
 
   MINIMUM_SEEDS = 5
   MAX_FILE_SIZE = 1000000000 # in bytes
   MIN_FILE_SIZE = 400000000
 
   def queue_date
+    return "Loading..." if self.api_queried.nil?
     return "(In Theatres)" if self.dvd_release_date.nil?
     return "(#{self.year})" if (Date.today > self.dvd_release_date)
     return "(Comes out #{self.dvd_release_date})" if self.dvd_release_date
@@ -40,7 +43,7 @@ class Movie < ActiveRecord::Base
     end
 
     # check filesize
-    filesize = Movie.filesize_in_bytes result.size
+    filesize = result.size.to_i
     if filesize > MAX_FILE_SIZE || filesize < MIN_FILE_SIZE
       puts "File was either too big or too small: #{result.size}"
       return false
@@ -64,7 +67,13 @@ class Movie < ActiveRecord::Base
   end
 
   def display_eta
-    eta = downloads.first.eta
+    if self.download.nil?
+      return ""
+    end
+    if self.download_finish? || (self.download.eta != nil && self.download.eta <= 0)
+      return ""
+    end
+    eta = download.eta
     return nil if (eta.nil?)
     eta_in_seconds = eta.to_i
 
@@ -73,7 +82,7 @@ class Movie < ActiveRecord::Base
 
   def seconds_to_string(seconds)
     case
-      when seconds == -1
+      when seconds == 0
         "Done"
       when seconds < 60
         "< 1 min"
@@ -86,7 +95,38 @@ class Movie < ActiveRecord::Base
     end
   end
 
-  def self.perform(id)
+  def movie_cover_path
+    if api_queried.nil?
+      "loading_cover.png"
+    elsif thumbnail_url.nil?
+      "no_cover.png"
+    else
+      thumbnail_url
+    end
+  end
+
+  def update_from_api(search_term=self.search_term)
+    puts "Searching for #{search_term}"
+
+    Rotten.api_key = 'z2s2hk9pm7zw3zubd5mrbk2m'
+
+    result = RottenMovie.find(:title => search_term, :limit => 1)
+
+    update_attributes({
+                          :name => result.title,
+                          :dvd_release_date => result.release_dates.dvd,
+                          :year => result.year,
+                          :mpaa_rating => result.mpaa_rating,
+                          :thumbnail_url => result.posters.detailed,
+                          :url => result.links.alternate,
+                          :audience_score => result.ratings.audience_score,
+                          :critics_score => result.ratings.critics_score,
+                          :runtime => result.runtime,
+                          :api_queried => true
+                      })
+  end
+
+  def self.perform(id, search_term=nil, auto_download=false)
     movie = Movie.find(id)
 
     unless movie.api_queried
@@ -94,42 +134,36 @@ class Movie < ActiveRecord::Base
       include RottenTomatoes
       Rotten.api_key = 'z2s2hk9pm7zw3zubd5mrbk2m'
 
-      puts "Searching Rotten Tomatoes API for movie #{movie.search_term}"
+      unless search_term
+        search_term = movie.search_term
+      end
 
-      result = RottenMovie.find(:title => movie.search_term, :expand_results => true, :limit => 1)
+      Notification.create(:notification => "Searching rotten tomatoes for '#{search_term}'")
+      puts "Searching Rotten Tomatoes API for movie #{search_term}"
 
-      if result
-        Notification.create(:notification => "Received results for movie #{result.title}. Click <a href='/movie/#{id}'>here</a> if you'd like to view/edit.", :read => false)
-        movie.update_attributes({
-            :name => result.title,
-            :dvd_release_date => result.release_dates.dvd,
-            :year => result.year,
-            :mpaa_rating => result.mpaa_rating,
-            :thumbnail_url => result.posters.detailed,
-            :url => result.links.alternate,
-            :audience_score => result.ratings.audience_score,
-            :critics_score => result.ratings.critics_score,
-            :runtime => result.runtime,
-            :api_queried => true
-        })
-      else
-        puts "No results were found from Rotten Tomato API."
+      if (search_term)
+        movie.update_from_api(search_term)
+        Notification.create(:notification => "Updated '#{search_term}' information using rotten tomatoes.")
       end
     end
 
     if (movie.dvd_release_date)
       if (Date.today + 1.week) > movie.dvd_release_date # movies are usually released a little bit ahead of their time
-        Resque.enqueue(Torrent, id)
+        Resque.enqueue(Torrent, id) if auto_download
         puts "Enqueued the torrent"
       else
         puts "The movie hasn't been released yet. Will not enqueue the download."
+        Notification.create(:notification => "The movie '#{movie.search_term}' is not available on DVD yet, and is not downloading.")
         # TODO: Figure out how to enqueue this one. Schedule it on a date. Or just every night at midnight.
       end
     else
       puts "The movie didn't have a DVD release date listed. It's probably still in theatres."
+      Notification.create(:notification => "The movie '#{movie.search_term}' is still in theatres and is not downloading.")
     end
 
 
+  rescue Errno::ECONNRESET
+    Notification.create(:notification => "The connection could not be made. Are you connected to the internet?")
   end
 
   def self.filesize_in_bytes(filesize)
@@ -180,4 +214,20 @@ class Movie < ActiveRecord::Base
     movies.map { |movie| "#{movie.title} (#{movie.year})" }
   end
 
+  def image_percentage_height
+    if download.nil?
+      return "250px"
+    end
+
+    if download.percent_done.nil?
+      return "250px"
+    end
+
+    total_height = 250
+    "#{(1.0 - (download.percent_done / 100.0)) * total_height}px"
+  end
+
+  def fetch_and_save_torrents(search_term)
+    Resque.enqueue(Torrent, self.id, search_term, :all, false)
+  end
 end

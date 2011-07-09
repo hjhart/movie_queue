@@ -2,5 +2,6 @@
 
 <%= render 'form' %>
 
-<%= link_to 'Show', @movie %> |
-<%= link_to 'Back', movies_path %>
+<td><%= link_to image_tag("/assets/pencil.png", :border=>0), edit_movie_path(@movie) %></td>
+<td><%= link_to image_tag("/assets/ex.png", :border=>0), @movie, confirm: 'Are you sure?', method: :delete %></td>
+<td><%= link_to image_tag("/assets/download.png", :border=>0), "/movie/#{@movie.id}/download" %></td>

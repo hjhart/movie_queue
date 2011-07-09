@@ -1,6 +1,8 @@
 class NotificationsController < ApplicationController
   def poll
-    render json: Notification.unread
+    notifications = Notification.unread
+    notifications.each { |n| n.update_attributes({:read => true}) unless n.sticky }
+    render json: notifications
   end
 
   def read

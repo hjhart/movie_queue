@@ -1,7 +1,6 @@
 source 'http://rubygems.org'
 
 gem 'rails', '3.1.0.rc1'
-gem 'tpb', '0.0.3'
 
 # Bundle edge Rails instead:
 # gem 'rails',     :git => 'git://github.com/rails/rails.git'
@@ -16,8 +15,14 @@ gem 'jquery-rails'
 gem 'nokogiri'
 gem 'rottentomatoes'
 gem 'resque'
+gem 'hpricot'
 gem 'transmission-client'
-gem 'bencode'
+gem 'bencode', '~>0.7.0'
+gem 'torrent_api', '0.1.2'
+gem 'god'
+
+
+
 
 # Use unicorn as the web server
 # gem 'unicorn'
@@ -30,6 +35,7 @@ gem 'bencode'
 
 group :development do
   gem 'awesome_print'
+  gem 'capistrano'
 end
 
 group :test do

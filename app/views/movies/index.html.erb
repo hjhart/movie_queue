@@ -4,48 +4,16 @@
 
 <h1>Movie Queue</h1>
 <%= link_to '+', new_movie_path, :class => "plus add_movie" %><%= link_to 'Movie', new_movie_path, :class => "add_movie" %>
-<br />
-<br />
-
-<h2>Ready to Watch</h2>
-<table>
-<% Movie.ready.each do |movie| %>
-  <tr>
-    <td><%= link_to movie.search_term, movie_path(movie) %></td>
-    <td><%= link_to image_tag("/assets/pencil.png", :border=>0), edit_movie_path(movie) %></td>
-    <td><%= link_to image_tag("/assets/ex.png", :border=>0), movie, confirm: 'Are you sure?', method: :delete %></td>
-  </tr>
+<br/>
+<br/>
+<div style="clear: both;"></div>
+<% @movies.each do |movie| %>
+<div style="width: 200px; float: left; margin: 20px 20px 0 0; height: 275px;">
+  <div style="overflow: hidden; height: 250px; width: 160px;"><%= link_to image_tag(movie.movie_cover_path, :style => "position: relative; top: 0; height: 250px;"), edit_movie_path(movie) %></div>
+  <a href="<%= edit_movie_path(movie) %>"><div style="height: <%= movie.image_percentage_height %>;  width: 160px;  background-color: black;  opacity : 0.6;  filter: alpha(opacity=40); background-color: #000; position: relative; top: -250px;"></div></a>
+  <span style="position:relative; top: -<%= movie.image_percentage_height %>; text-align: center; width: 160px;"><%= movie.display_eta %></span>
+</div>
 <% end %>
-</table>
-
-<h2>Downloading</h2>
-<table>
-<% Movie.downloading.each do |movie| %>
-      <script type="text/javascript">
-        $(document).ready(function() {
-            $(".status_bar#<%= movie.id %>").progressbar({ value: <%= movie.percent_complete %> });
-        })
-      </script>
-  <tr>
-    <td><%= link_to movie.name, movie_path(movie) %> (<%= movie.year %>)</td>
-    <td class="eta"><%= movie.display_eta %></td>
-    <td><div class="status_bar" id="<%= movie.id %>"</td>
-    <td><%= link_to image_tag("/assets/pencil.png", :border=>0), edit_movie_path(movie) %></td>
-    <td><%= link_to image_tag("/assets/ex.png", :border=>0), movie, confirm: 'Are you sure?', method: :delete %></td>
-  </tr>
-<% end %>
-</table>
-
-<h2>Queued</h2>
-<table>
-<% Movie.queued.each do |movie| %>
-  <tr>
-    <td><%= link_to movie.search_term, movie_path(movie) %> <%= movie.queue_date %></td>
-    <td><%= link_to image_tag("/assets/pencil.png", :border=>0), edit_movie_path(movie) %></td>
-    <td><%= link_to image_tag("/assets/ex.png", :border=>0), movie, confirm: 'Are you sure?', method: :delete %></td>
-    <td><%= link_to image_tag("/assets/download.png", :border=>0), "movie/#{movie.id}/download" %></td>
-  </tr>
-<% end %>
-</table>
+<div style="clear: both;"></div>
 
 <%= link_to 'New Movie', new_movie_path %>

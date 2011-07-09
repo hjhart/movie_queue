@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110621145850) do
+ActiveRecord::Schema.define(:version => 20110626225737) do
 
   create_table "downloads", :force => true do |t|
     t.string   "url"
@@ -48,7 +48,19 @@ ActiveRecord::Schema.define(:version => 20110621145850) do
 
   create_table "notifications", :force => true do |t|
     t.string   "notification"
-    t.boolean  "read"
+    t.boolean  "read",         :default => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.boolean  "sticky",       :default => false
+  end
+
+  create_table "torrents", :force => true do |t|
+    t.integer  "movie_id"
+    t.string   "name"
+    t.integer  "seeds"
+    t.integer  "leeches"
+    t.string   "link"
+    t.integer  "size"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

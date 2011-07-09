@@ -1,0 +1,14 @@
+
+<table>
+<tr>
+  <th>Name</th><th>Seeds</th><th>Leeches</th><th>Size</th>
+</tr>
+  <% @torrents.each do |t|  %>
+<tr>
+  <td><%= link_to t.name.force_encoding("ISO-8859-1"), movie_torrent_path(@movie, t) %></td>
+  <td><%= t.seeds %></td>
+  <td><%= t.leeches %></td>
+  <td><%= "#{(t.size / 1000000).to_i}mb"%></td>
+</tr>
+
+<% end %></table>

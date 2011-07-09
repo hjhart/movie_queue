@@ -3,10 +3,12 @@ MovieQueue::Application.routes.draw do
   match 'notifications/:id/read' => 'notifications#read'
   resources :movies do
     resources :downloads
+    resources :torrents
   end
 
   root :to => 'movies#index'
   match 'movielist.json' => 'movies#list'
+  match 'torrent_list.json' => 'torrents#list'
   match 'movie/:id/download' => 'movies#download'
   # The priority is based upon order of creation:
   # first created -> highest priority.
