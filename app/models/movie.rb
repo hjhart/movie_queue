@@ -7,7 +7,6 @@
 # TODO: Notifications that a resque queue completed but failed. "Push notifications"
 
 require 'rubygems'
-require 'pirate_bay'
 include RottenTomatoes
 
 class Movie < ActiveRecord::Base
@@ -191,8 +190,9 @@ class Movie < ActiveRecord::Base
   def eligible_files
     movie = Movie.find(id)
     if (movie.name)
-      search = PirateBay::Search.new(movie.search_term)
-      if results = search.execute
+      t = TorrentApi.new()
+      t.search_term = search_term
+      if results = t.search
         filtered_results = results.select { |r| Movie.qualifies r }
       end
     end
