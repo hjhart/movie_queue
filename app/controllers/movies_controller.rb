@@ -17,7 +17,6 @@ class MoviesController < ApplicationController
     @movies << Movie.downloading.sort_by { |m| -(m.download.percent_done) }
     @movies << Movie.queued
     @movies = @movies.flatten
-    ap @movies
 
     respond_to do |format|
       format.html # index.html.erb
@@ -77,12 +76,6 @@ class MoviesController < ApplicationController
   def update
     @movie = Movie.find(params[:id])
     api_search_term = params[:movie][:name]
-
-    puts "params --------------------------"
-    ap params
-    puts "api search term -----------------"
-    puts api_search_term
-    puts "params --------------------------"
 
     if(api_search_term)
       @movie.update_from_api(api_search_term)
