@@ -106,5 +106,8 @@ class MoviesController < ApplicationController
     end
   end
 
+  def test
+    render :text => `whoami`
+  end
 
 end

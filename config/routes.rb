@@ -10,6 +10,7 @@ MovieQueue::Application.routes.draw do
   match 'movielist.json' => 'movies#list'
   match 'torrent_list.json' => 'torrents#list'
   match 'movie/:id/download' => 'movies#download'
+  match 'whoami' => 'movies#test'
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
