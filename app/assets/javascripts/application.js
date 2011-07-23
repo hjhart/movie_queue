@@ -37,16 +37,23 @@ $(document).ready(function() {
         })
     })
 
+    $("#movie_list").hide()
 
     $('input[id="rtfetch"]').click(function(e) {
         e.preventDefault();
         select = $('select[name="movie[name]"]')
         input = $('input[name="movie[search_term]"]')
         query = input.val()
+        spinner = $('#ajax_loader')
+
+        spinner.fadeIn()
+
+        $("#movie_list").slideDown()
 
         $.ajax({
             url: "/movielist.json?q=" + query,
             success: function(data) {
+                spinner.fadeOut()
                 console.debug("Data:", data)
                 select.children().remove()
                 selects = ""
@@ -65,12 +72,18 @@ $(document).ready(function() {
         });
     })
 
+    $('#add_movie').fancybox({ type: 'iframe', width: '600', height: '600'})
+
+    $('.movies.index').ready(function() {
+        setTimeout(function() { window.location.reload( false ) }, 60 * 1000)
+    })
+
     $('input[name="tor_fetch"]').click(function(e) {
         e.preventDefault();
         select = $('select[name="torrent_list"]')
         input = $('input[name="movie[search_term]"]')
         query = input.val()
-        form_action_with_id = $(this).closest('form').attr('action').match(/\d+/)
+        form_action_with_id = $(this).parent().siblings('form').attr('action').match(/\d+/)
         if(form_action_with_id == null) {
             createNotificationDiv(0, "You must save the movie first before getting torrents.", false)
             return false

@@ -4,7 +4,8 @@
         <div id="error_explanation">
           <h2><%= pluralize(@movie.errors.count, "error") %> prohibited this movie from being saved:</h2>
           <ul>
-            <% @movie.errors.full_messages.each do |msg| %>
+            <% @movie.errors.full_messages.each do |msg|
+            %>
                 <li><%= msg %></li>
             <% end %>
           </ul>
@@ -14,20 +15,13 @@
     <div class="field">
       <%= f.label :search_term %>
       <br/>
-      <%= f.text_field :search_term %>
-      <br/>
-      <%= submit_tag "Fetch List from Rotten Tomatoes", :name => "rtfetch", :id => "rtfetch" %>
-      <br/>
-      <%= submit_tag "Fetch torrent list", :name => "tor_fetch", :id => "tor_fetch" %>
+      <%= f.text_field :search_term %><%= submit_tag "Search", :name => "rtfetch", :id => "rtfetch" %><img src="/assets/ajax-loader.gif" id="ajax_loader"/>
     </div>
 
-    <div class="field">
+    <div class="field" id="movie_list" style="display:none">
       <%= f.label :name %>
       <br/>
-      <%= f.select(:name, ['Enter your query to get a list of movies'], {}, :disabled => true) %>
+      <%= f.select(:name, ['Enter your query to get a list of movies'], {}, :disabled => true) %><%= f.submit %>
     </div>
 
-    <div class="actions">
-      <%= f.submit %>
-    </div>
 <% end %>

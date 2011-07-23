@@ -3,7 +3,9 @@
 <head>
   <title>MovieQueue</title>
   <%= stylesheet_link_tag    "application" %>
+  <%= stylesheet_link_tag    "fancybox" %>
   <%= javascript_include_tag "application" %>
+  <%= javascript_include_tag "jquery.fancybox-1.3.4.pack" %>
   <%= csrf_meta_tags %>
 </head>
 <body class="<%= controller.controller_name %> <%= controller.action_name %>">
@@ -12,3 +14,4 @@
 
 </body>
 </html>
+

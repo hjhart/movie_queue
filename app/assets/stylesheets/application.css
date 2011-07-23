@@ -16,3 +16,7 @@
 a:link, a:visited {
     color: white;
 }
+
+#ajax_loader {
+    display:none;
+}

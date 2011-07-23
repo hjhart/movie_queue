@@ -3,8 +3,12 @@ class TorrentsController < ApplicationController
     search_param = params['q']
     movie_id = params['m_id']
     movie = Movie.find(movie_id)
+    if(search_param.nil? || search_param.nil?)
+      search_param = movie.search_term
+    end
     movie.fetch_and_save_torrents(search_param)
-    render text: "Okay!"
+    Notification.create({:notification => "The search call for '#{search_param}' has started."})
+    redirect_to '/'
   end
 
   def index

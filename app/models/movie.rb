@@ -211,7 +211,13 @@ class Movie < ActiveRecord::Base
     Rotten.api_key = 'z2s2hk9pm7zw3zubd5mrbk2m'
 
     movies = RottenMovie.find(:title => movie_name, :limit => 10)
-    movies.map { |movie| "#{movie.title} (#{movie.year})" }
+    if(movies.is_a? Array)
+      movies.map { |movie| "#{movie.title} (#{movie.year})" }
+    elsif(movies.is_a? PatchedOpenStruct)
+      ["#{movies.title} (#{movies.year})"]
+    else
+      raise "There was a type error on the returned result set."
+    end
   end
 
   def image_percentage_height

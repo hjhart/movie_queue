@@ -1,7 +1,30 @@
 <h1>Editing movie</h1>
 
+<script type="text/javascript">
+$(document).ready(function() {
+    console.debug(parent, window, $.fancybox)
+    if(parent != window) {
+        parent.window.location.reload( false )
+//        parent.$.fancybox.close();
+    } else {
+        console.debug("no fancybox detected.")
+    }
+  })
+</script>
+
 <%= render 'form' %>
 
-<td><%= link_to image_tag("/assets/pencil.png", :border=>0), edit_movie_path(@movie) %></td>
+<% if(@movie.torrents.size == 0) %>
+
+<%= form_for(@movie, :url => "/movie/#{@movie.id}/fetch_torrents") do |f| %>
+    <div class="actions" id="torrent_list">
+      <%= f.submit "Fetch torrent list" %>
+    </div>
+<% end %>
+
+<% else %>
+    <%= link_to "View Torrents", movie_torrents_path(@movie) %>
+
+<% end %>
 <td><%= link_to image_tag("/assets/ex.png", :border=>0), @movie, confirm: 'Are you sure?', method: :delete %></td>
-<td><%= link_to image_tag("/assets/download.png", :border=>0), "/movie/#{@movie.id}/download" %></td>
+<td><%= link_to image_tag("/assets/download.png", :border=>0), movie_torrents_path(@movie) %></td>

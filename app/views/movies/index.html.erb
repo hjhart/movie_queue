@@ -1,9 +1,8 @@
 <%# TODO: Scope out the names to the appropriate tables %>
 <%# TODO: Check movie release date after adding (add to resque queue) %>
 <p id="notice"><%= notice %></p>
-
 <h1>Movie Queue</h1>
-<%= link_to '+', new_movie_path, :class => "plus add_movie" %><%= link_to 'Movie', new_movie_path, :class => "add_movie" %>
+<%= link_to '+', new_movie_path, :class => "plus add_movie" %><%= link_to 'Movie', new_movie_path, :class => "add_movie", :id => "add_movie" %>
 <br/>
 <br/>
 <div style="clear: both;"></div>
@@ -11,7 +10,7 @@
 <div style="width: 200px; float: left; margin: 20px 20px 0 0; height: 275px;">
   <div style="overflow: hidden; height: 250px; width: 160px;"><%= link_to image_tag(movie.movie_cover_path, :style => "position: relative; top: 0; height: 250px;"), edit_movie_path(movie) %></div>
   <a href="<%= edit_movie_path(movie) %>"><div style="height: <%= movie.image_percentage_height %>;  width: 160px;  background-color: black;  opacity : 0.6;  filter: alpha(opacity=40); background-color: #000; position: relative; top: -250px;"></div></a>
-  <span style="position:relative; top: -<%= movie.image_percentage_height %>; text-align: center; width: 160px;"><%= movie.display_eta %></span>
+  <span style="position:relative; top: '-<%= movie.image_percentage_height %>'; text-align: center; width: 160px;"><%= movie.display_eta %></span>
 </div>
 <% end %>
 <div style="clear: both;"></div>

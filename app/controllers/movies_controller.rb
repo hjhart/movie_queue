@@ -64,6 +64,7 @@ class MoviesController < ApplicationController
     respond_to do |format|
       if @movie.save
         Resque.enqueue(Movie, @movie.id, params[:movie][:name])
+        Resque.enqueue(Torrent, @movie.id, @movie.search_term, :all, false)
         format.html { redirect_to edit_movie_url @movie }
       else
         format.html { render action: "new" }
