@@ -5,7 +5,7 @@ RAILS_ENV = ENV["RAILS_ENV"]
 God.watch do |w|
   w.name = "transmission-watcher"
   w.interval = 30.seconds
-  w.start = "cd #{RAILS_ROOT} && ruby lib/transmission_watch.rb"
+  w.start = "cd #{RAILS_ROOT} && RAILS_ENV=#{RAILS_ENV} ruby lib/transmission_watch.rb"
   w.start_grace = 10.seconds
   w.restart_grace = 10.seconds
 
@@ -21,7 +21,7 @@ end
 God.watch do |w|
   w.name = "resque-1.8.0"
   w.interval = 30.seconds
-  w.start = "cd #{RAILS_ROOT} && rake environment resque:work QUEUE=*"
+  w.start = "cd #{RAILS_ROOT} && RAILS_ENV=#{RAILS_ENV} rake environment resque:work QUEUE=*"
   w.start_grace = 10.seconds
 
   # retart if memory gets too high

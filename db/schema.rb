@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110626225737) do
+ActiveRecord::Schema.define(:version => 20110723165124) do
 
   create_table "downloads", :force => true do |t|
     t.string   "url"
@@ -60,7 +60,7 @@ ActiveRecord::Schema.define(:version => 20110626225737) do
     t.integer  "seeds"
     t.integer  "leeches"
     t.string   "link"
-    t.integer  "size"
+    t.integer  "size",       :limit => 8
     t.datetime "created_at"
     t.datetime "updated_at"
   end

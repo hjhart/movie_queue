@@ -29,6 +29,10 @@ set :shared_database_path,        "#{shared_path}/databases"
 set :shared_config_path,          "#{shared_path}/config"
 
 
+task :link_configuration_file, :roles => :db do
+  run "ln -nsf #{shared_config_path}/database.yml #{current_path}/config/database.yml"
+end
+
 namespace :sqlite3 do
 
   desc "Generate a database configuration file"
@@ -58,7 +62,7 @@ end
 if use_sqlite3
   after "deploy:setup", "sqlite3:make_shared_folder"
   after "deploy:setup", "sqlite3:build_configuration"
-  after "deploy:symlink", "sqlite3:link_configuration_file"
+  after "deploy:symlink", "link_configuration_file"
 end
 
 
