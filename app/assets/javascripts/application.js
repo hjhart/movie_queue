@@ -11,9 +11,9 @@
 
 var openNotifications = []
 var timeout = null;
+var interval = null;
 
 $(document).ready(function() {
-    queryNotifications()
 
     $("input[id=movie_adder]").autocomplete({
         source: "/movielist.json" + $("input[id=movie_adder]").val(),
@@ -22,10 +22,6 @@ $(document).ready(function() {
             console.debug($(this).val())
         }
     });
-
-    setInterval(function() {
-        queryNotifications()
-    }, 5000)
 
     $('a.download_torrent').click(function(e) {
         e.preventDefault()
@@ -72,24 +68,16 @@ $(document).ready(function() {
         });
     })
 
-    $('.add_movie').fancybox(
-    {
+    $('.add_movie').fancybox({
         type: 'iframe',
         width: '8',
         height: '4',
-        autoScale: false,
-        onStart: function() {
-            clearTimeout(timeout);
-        },
-        onClosed: function() {
-            startRefreshTimer();
-        }
-    }
-            )
+        autoScale: false
+    })
 
 
     $('.movies.index').ready(function() {
-        startRefreshTimer()
+//        startRefreshTimer()
     })
 
     function startRefreshTimer() {
@@ -110,12 +98,16 @@ $(document).ready(function() {
                 }
             },
             show: {
-                event: 'mouseover'
-//                solo: true // Only show one tooltip at a time
+                event: 'mouseover',
+                solo: true // Only show one tooltip at a time
+            },
+            hide: {
+                event: 'mouseleave',
+                fixed: true
             },
             style: {
                 classes: 'ui-tooltip-dark ui-tooltip-shadow',
-                width: "400px"
+                width: "500px"
             },
             position: {
                 at: 'top left'

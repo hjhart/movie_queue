@@ -1,21 +1,26 @@
 <%# TODO: Scope out the names to the appropriate tables %>
 <%# TODO: Check movie release date after adding (add to resque queue) %>
 <p id="notice"><%= notice %></p>
-<h1>Movie Queue</h1>
+<script type="text/javascript">
+
+    $('.movies.index').ready(function() {
+        queryNotifications()
+
+        setInterval(function() {
+            queryNotifications()
+        }, 5000)
+    });
+</script>
+<h1 style="padding-left: 4em;">Movie Queue</h1>
 <%= link_to '+', new_movie_path, :class => "plus add_movie" %><%= link_to 'Movie', new_movie_path, :class => "add_movie", :id => "add_movie" %>
 <br/>
 <br/>
 <div style="clear: both;"></div>
 <% @movies.each do |movie| %>
-<div style="width: 200px; float: left; margin: 20px 20px 0 0; height: 275px;" class="movie_info" data-id="<%= movie.id %>" data-title="<%=movie.name %>">
-  <div style="overflow: hidden; height: 250px; width: 160px;">
-    <%= link_to image_tag(movie.movie_cover_path, :style => "position: relative; top: 0; height: 250px;"), edit_movie_path(movie) %>
-  </div>
-  <a href="<%= edit_movie_path(movie) %>">
-    <div style="height: <%= movie.image_percentage_height %>;  width: 160px;  background-color: black;  opacity : 0.6;  filter: alpha(opacity=40); background-color: #000; position: relative; top: -250px;"></div>
-  </a>
-  <span style="position:relative; top: '-<%= movie.image_percentage_height %>'; text-align: center; width: 160px;"><%= movie.display_eta %></span>
-</div>
+
+    <div style="float: left; margin: 10px; height: 200px; overflow: hidden;" class="movie_info" data-id="<%= movie.id %>" data-title="<%= movie.name %>">
+      <%= link_to image_tag(movie.movie_cover_path), edit_movie_path(movie) %>
+    </div>
 <% end %>
 <div style="clear: both;"></div>
 

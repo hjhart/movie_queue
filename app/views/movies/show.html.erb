@@ -1,37 +1,43 @@
-<html>
-<head>
-  <title>Whatever.</title>
-  <style type="text/css">
-    table * {
-        font-size: 12px;
-    }
-    #movie_info {
-        font-size: 12px;
-    }
-   </style>
-</head>
-<body>
-<table id="movie_info">
-  <tr>
-    <td><strong>Year</strong></td>
-    <td><%= @movie.year %></td>
-  </tr>
-  <tr>
-    <td><strong>Rating</strong></td>
-    <td><%= @movie.mpaa_rating %></td>
-  </tr>
-  <tr>
-    <td><strong>Critics Score:</strong></td>
-    <td><%= @movie.critics_score %></td>
-  </tr>
-  <tr>
-    <td><strong>Audience Score:</strong></td>
-    <td><%= @movie.audience_score %></td>
-  </tr>
-  <tr>
-    <td><strong>Movie Length:</strong></td>
-    <td><%= @movie.seconds_to_string(@movie.runtime * 60) %></td>
-  </tr>
-</table>
-</body>
-</html>
+<div class="movies show">
+<% if @movie.api_queried.nil? %>
+    <strong>Fetching Information from Rotten Tomatoes...</strong>
+<% else %>
+
+
+<% if @movie.download.present? %>
+  <div class="status_bar large">
+    <div class="progress" style="width: <%= @movie.percent_complete %>%"></div>
+  </div>
+<% end %>
+  <div class="rating"><%= image_tag @movie.rt_image %><%= @movie.critics_score %>%</div>
+  <div class="rating"><%= image_tag @movie.meta_image %><%= @movie.audience_score %>%</div>
+
+  <table>
+    <tr>
+      <th>Running Time</th>
+      <th>Year</th>
+<% if @movie.download.present? %>
+      <th>Filesize</th>
+      <th>ETA:</th>
+<% end %>
+    </tr>
+    <tr>
+      <td><%= @movie.display_runtime %></td>
+      <td><%= @movie.year %></td>
+<% if @movie.download.present? %>
+      <td><%= @movie.display_filesize %></td>
+      <td><%= @movie.display_eta %></td>
+<% end %>
+    </tr>
+  </table>
+
+<% if @movie.download.nil? && @movie.torrents.present? %>
+  <div class="info"><%= link_to "Choose Download", movie_torrents_path(@movie) %></div>
+<% elsif @movie.torrents.empty? %>
+  <div class="info"><%= link_to "Fetch Torrents", "/movie/#{@movie.id}/fetch_torrents" %></div>
+<% end %>
+  <div class="info"><%= link_to "Delete", @movie, method: :delete %></div>
+  <div class="info"><%= link_to "View on RT", @movie.url %></div>
+  <div class="info"><%= image_tag @movie.rating_image %></div>
+</div>
+<% end %>

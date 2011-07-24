@@ -1,6 +1,8 @@
 require 'yaml'
 require 'active_record'
 require 'rottentomatoes'
+require 'ap'
+
 require File.join(File.expand_path(File.dirname(__FILE__)), '..', 'app', 'models', 'download')
 require File.join(File.expand_path(File.dirname(__FILE__)), '..', 'app', 'models', 'movie')
 require File.join(File.expand_path(File.dirname(__FILE__)), '..', 'app', 'models', 'notification')
@@ -16,10 +18,12 @@ begin
   EventMachine.run do
     t = Transmission::Client.new
 
-    EM.add_periodic_timer(15) do
+    EM.add_periodic_timer(3) do
 #      Get hashes and remove the stale downloading movies.
 #      
       t.torrents do |torrents|
+        ap t
+
         downloading_hashes = []
 
         torrents.each do |torrent|
@@ -35,11 +39,14 @@ begin
             movie.save
             download = movie.download
             download.eta = nil
+            download.download_location = File.join(torrent.downloadDir, torrent.name)
             download.status = Download::OPENED
             download.percent_done = 0
             download.save
           end
         end
+
+        
 
         if(stopped.size > 0)
           notification =  "#{stopped.size} downloads have stopped. Updated their records. (#{stopped.join(',')})"

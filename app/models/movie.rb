@@ -23,6 +23,59 @@ class Movie < ActiveRecord::Base
   MINIMUM_SEEDS = 5
   MAX_FILE_SIZE = 1000000000 # in bytes
   MIN_FILE_SIZE = 400000000
+  CERTIFIED_FRESH_SCORE = 70
+
+
+  def rating_image
+    return "question_mark.png" if mpaa_rating.nil?
+    image_name = case mpaa_rating.downcase
+      when "r"
+        "R.png"
+      when "pg-13"
+        "PG-13.png"
+      when "g"
+        "G.png"
+      when "nc-17"
+        "NC-17.png"
+      when "pg"
+        "PG.png"
+      else
+        "question_mark.png"
+    end
+
+    File.join("ratings", image_name)
+  end
+
+  def rt_image
+    return "/assets/question_mark.png" if critics_score.nil?
+    if(critics_score > CERTIFIED_FRESH_SCORE)
+      "/assets/certified_fresh.png"
+    else
+      "/assets/splat.png"
+    end
+  end
+
+  def meta_image
+    return "/assets/question_mark.png" if audience_score.nil?
+    if(audience_score > CERTIFIED_FRESH_SCORE)
+      "/assets/meta_certified_fresh.png"
+    else
+      "/assets/meta_splat.png"
+    end
+
+  end
+
+  def display_filesize
+    return "" if download.nil?
+    filesize = download.filesize
+    if filesize.nil?
+      ""
+    elsif(filesize > 1000000 && filesize < 1000000000)
+      "%0.1f" % (filesize / 1000000.0) + "mb"
+    elsif(filesize >= 1000000000)
+      "%0.1f" % (filesize / 1000000000.0) + "gb"
+    end
+  end
 
   def queue_date
     return "Loading..." if self.api_queried.nil?
@@ -60,9 +113,15 @@ class Movie < ActiveRecord::Base
   end
 
   def percent_complete
-    percent = downloads.first.percent_done
+    return 0 if download.nil?
+    percent = download.percent_done
     return 0 if percent.nil?
     percent
+  end
+
+  def display_runtime
+    return "" if(runtime.nil?)
+    seconds_to_string(runtime * 60)
   end
 
   def display_eta

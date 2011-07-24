@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110723165124) do
+ActiveRecord::Schema.define(:version => 20110724070949) do
 
   create_table "downloads", :force => true do |t|
     t.string   "url"
@@ -25,6 +25,7 @@ ActiveRecord::Schema.define(:version => 20110723165124) do
     t.string   "hash"
     t.integer  "eta"
     t.integer  "torrent_id"
+    t.string   "download_location"
   end
 
   create_table "movies", :force => true do |t|
@@ -56,10 +57,10 @@ ActiveRecord::Schema.define(:version => 20110723165124) do
 
   create_table "torrents", :force => true do |t|
     t.integer  "movie_id"
-    t.string   "name"
+    t.text     "name"
     t.integer  "seeds"
     t.integer  "leeches"
-    t.string   "link"
+    t.text     "link"
     t.integer  "size",       :limit => 8
     t.datetime "created_at"
     t.datetime "updated_at"

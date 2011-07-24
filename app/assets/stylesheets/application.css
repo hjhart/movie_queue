@@ -8,9 +8,42 @@
   .
 */
 
-.status_bar.ui-progressbar {
+.status_bar.small {
     height: 0.5em;
+    width: 173px;
+}
+
+.status_bar.large {
+    height: 0.5em;
+    width: 100%;
+}
+
+.movies.show .rating {
+    width: 50%;
+    float: left;
+    margin: 20px 0;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.rating img {
     margin-right: 20px;
+}
+
+.info {
+    width: 25%;
+    float: left;
+}
+
+.status_bar {
+    margin-right: 20px;
+    border: 1px solid black;
+    background-color: white;
+}
+
+.progress {
+    background-color: green;
+    height: 0.5em;
 }
 
 a:link, a:visited {
@@ -18,5 +51,23 @@ a:link, a:visited {
 }
 
 #ajax_loader {
-    display:none;
+    display: none;
+}
+
+.movies.show * {
+    font-size: 12px;
+}
+
+.movies.show table {
+    width: 100%;
+    text-align: left;
+    margin: 20px 0;
+}
+
+.movies.show .info img {
+    background-color: white;
+}
+
+.movies.show .info {
+    width: 33%;
 }
