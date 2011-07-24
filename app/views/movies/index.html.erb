@@ -7,12 +7,17 @@
 <br/>
 <div style="clear: both;"></div>
 <% @movies.each do |movie| %>
-<div style="width: 200px; float: left; margin: 20px 20px 0 0; height: 275px;">
-  <div style="overflow: hidden; height: 250px; width: 160px;"><%= link_to image_tag(movie.movie_cover_path, :style => "position: relative; top: 0; height: 250px;"), edit_movie_path(movie) %></div>
-  <a href="<%= edit_movie_path(movie) %>"><div style="height: <%= movie.image_percentage_height %>;  width: 160px;  background-color: black;  opacity : 0.6;  filter: alpha(opacity=40); background-color: #000; position: relative; top: -250px;"></div></a>
+<div style="width: 200px; float: left; margin: 20px 20px 0 0; height: 275px;" class="movie_info" data-id="<%= movie.id %>" data-title="<%=movie.name %>">
+  <div style="overflow: hidden; height: 250px; width: 160px;">
+    <%= link_to image_tag(movie.movie_cover_path, :style => "position: relative; top: 0; height: 250px;"), edit_movie_path(movie) %>
+  </div>
+  <a href="<%= edit_movie_path(movie) %>">
+    <div style="height: <%= movie.image_percentage_height %>;  width: 160px;  background-color: black;  opacity : 0.6;  filter: alpha(opacity=40); background-color: #000; position: relative; top: -250px;"></div>
+  </a>
   <span style="position:relative; top: '-<%= movie.image_percentage_height %>'; text-align: center; width: 160px;"><%= movie.display_eta %></span>
 </div>
 <% end %>
 <div style="clear: both;"></div>
 
 <%= link_to 'New Movie', new_movie_path %>
+

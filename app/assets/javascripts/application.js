@@ -10,10 +10,11 @@
 //= require_tree .
 
 var openNotifications = []
+var timeout = null;
 
 $(document).ready(function() {
     queryNotifications()
-    
+
     $("input[id=movie_adder]").autocomplete({
         source: "/movielist.json" + $("input[id=movie_adder]").val(),
         minLength: 2,
@@ -54,7 +55,6 @@ $(document).ready(function() {
             url: "/movielist.json?q=" + query,
             success: function(data) {
                 spinner.fadeOut()
-                console.debug("Data:", data)
                 select.children().remove()
                 selects = ""
                 $.each(data, function(index, element) {
@@ -72,11 +72,58 @@ $(document).ready(function() {
         });
     })
 
-    $('#add_movie').fancybox({ type: 'iframe', width: '600', height: '600'})
+    $('.add_movie').fancybox(
+    {
+        type: 'iframe',
+        width: '8',
+        height: '4',
+        autoScale: false,
+        onStart: function() {
+            clearTimeout(timeout);
+        },
+        onClosed: function() {
+            startRefreshTimer();
+        }
+    }
+            )
+
 
     $('.movies.index').ready(function() {
-        setTimeout(function() { window.location.reload( false ) }, 60 * 1000)
+        startRefreshTimer()
     })
+
+    function startRefreshTimer() {
+        timeout = setTimeout(function() {
+            window.location.reload(false)
+        }, 60 * 1000)
+    }
+
+    $('.movie_info').each(function() {
+        $(this).qtip({
+            content: {
+                text: '<img src="/assets/ajax-loader.gif" alt="Loading..." />',
+                ajax: {
+                    url: '/movies/' + $(this).attr('data-id')
+                },
+                title: {
+                    text: $(this).attr('data-title')
+                }
+            },
+            show: {
+                event: 'mouseover'
+//                solo: true // Only show one tooltip at a time
+            },
+            style: {
+                classes: 'ui-tooltip-dark ui-tooltip-shadow',
+                width: "400px"
+            },
+            position: {
+                at: 'top left'
+            }
+
+        })
+    })
+
 
     $('input[name="tor_fetch"]').click(function(e) {
         e.preventDefault();
@@ -84,13 +131,12 @@ $(document).ready(function() {
         input = $('input[name="movie[search_term]"]')
         query = input.val()
         form_action_with_id = $(this).parent().siblings('form').attr('action').match(/\d+/)
-        if(form_action_with_id == null) {
+        if (form_action_with_id == null) {
             createNotificationDiv(0, "You must save the movie first before getting torrents.", false)
             return false
         } else {
             movie_id = form_action_with_id[0]
         }
-
 
 
         $.ajax({
@@ -157,8 +203,10 @@ function createNotificationDiv(id, text, sticky) {
     openNotifications.push(id)
     console.debug("Updated openNotifications", openNotifications)
 
-    if(!sticky) {
-        setTimeout(function() { notification_holder.find("div#" + id).fadeOut() }, 5000);
+    if (!sticky) {
+        setTimeout(function() {
+            notification_holder.find("div#" + id).fadeOut()
+        }, 5000);
     }
 
 }

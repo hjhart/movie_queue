@@ -1,14 +1,23 @@
-<strong><%= @movie.name %></strong> (<%= @movie.year %>)
-<table>
+<html>
+<head>
+  <title>Whatever.</title>
+  <style type="text/css">
+    table * {
+        font-size: 12px;
+    }
+    #movie_info {
+        font-size: 12px;
+    }
+   </style>
+</head>
+<body>
+<table id="movie_info">
   <tr>
-    <td rowspan="6"><img src="<%= @movie.thumbnail_url %>" alt="Rotten Tomatoes thumb for <%= @movie.name %>"/></td>
+    <td><strong>Year</strong></td>
+    <td><%= @movie.year %></td>
   </tr>
   <tr>
-    <td><strong>Search Term:</strong></td>
-    <td><%= @movie.search_term %></td>
-  </tr>
-  <tr>
-    <td>Rating</td>
+    <td><strong>Rating</strong></td>
     <td><%= @movie.mpaa_rating %></td>
   </tr>
   <tr>
@@ -24,3 +33,5 @@
     <td><%= @movie.seconds_to_string(@movie.runtime * 60) %></td>
   </tr>
 </table>
+</body>
+</html>
