@@ -13,9 +13,8 @@
     <% end %>
 
     <div class="field">
-      <%= f.label :search_term %>
-      <br/>
-      <%= f.text_field :search_term %><%= submit_tag "Search", :name => "rtfetch", :id => "rtfetch" %><img src="/assets/ajax-loader.gif" id="ajax_loader"/>
+      <%= f.text_field :search_term %><%= submit_tag "Search", :name => "rtfetch", :id => "rtfetch" %>
+      <img src="/assets/ajax-loader.gif" id="ajax_loader"/>
     </div>
 
     <div class="field" id="movie_list" style="display:none">
@@ -23,5 +22,4 @@
       <br/>
       <%= f.select(:name, ['Enter your query to get a list of movies'], {}, :disabled => true) %><%= f.submit %>
     </div>
-
 <% end %>

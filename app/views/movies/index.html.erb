@@ -18,11 +18,8 @@
 <div style="clear: both;"></div>
 <% @movies.each do |movie| %>
 
-    <div style="float: left; margin: 10px; height: 200px; overflow: hidden;" class="movie_info" data-id="<%= movie.id %>" data-title="<%= movie.name %>">
-      <%= link_to image_tag(movie.movie_cover_path), edit_movie_path(movie) %>
+    <div style="float: left; margin: 10px; height: 150px; overflow: hidden;" class="movie_info" data-id="<%= movie.id %>" data-title="<%= movie.name %>">
+      <%= link_to image_tag(movie.movie_cover_path, { :width => '125px' }), edit_movie_path(movie) %>
     </div>
 <% end %>
 <div style="clear: both;"></div>
-
-<%= link_to 'New Movie', new_movie_path %>
-

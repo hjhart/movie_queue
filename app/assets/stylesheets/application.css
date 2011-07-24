@@ -71,3 +71,11 @@ a:link, a:visited {
 .movies.show .info {
     width: 33%;
 }
+
+.movies.create {
+    padding: 20px;
+}
+
+.movies.create * {
+    font-size: 20px;
+}

@@ -70,8 +70,8 @@ $(document).ready(function() {
 
     $('.add_movie').fancybox({
         type: 'iframe',
-        width: '8',
-        height: '4',
+        width: 450,
+        height: 250,
         autoScale: false
     })
 
@@ -110,7 +110,8 @@ $(document).ready(function() {
                 width: "500px"
             },
             position: {
-                at: 'top left'
+                at: 'top left',
+                viewport: $(window)
             }
 
         })
