@@ -1,6 +1,0 @@
-set up a crontab
-
-in shell, crontab -e
-*/5 * * * * /bin/bash -l -c 'cd ~/Sites/movie_queue/ && rails runner "Movie.enqueue_all"'
-
-
