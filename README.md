@@ -9,7 +9,7 @@ Reach me at : hjhart [at] gmail [dot] com
 
 ## Purpose
 
-MovieQueue is an ad-free, stress-free, accessible-anywhere server whose sole purpose is downloading movies that YOU want to watch. It queries multiple torrent websites to search for movie torrents and brings them back to the easy-to-use web interface so you can download the best torrent for your needs. 
+MovieQueue is an ad-free, no-maintenance, webserver whose sole purpose is downloading movies you want to watch.  It queries multiple bittorrent websites and brings search results back to the web interface so you can pick the best one to download. You can add a movie from anywhere you can find a web browser, and come home later only to find your movie is ready to watch! Cool, huh?
 
 ## Screenshots
 
@@ -28,26 +28,23 @@ Add A Movie dialogue
 
 ## Features
 
-- Plugs into RottenTomatoes for the meta data (coverart, metacritic score, rottentomatoes score, runtime, mpaa rating, link to RT to watch trailers)
-- Plugs into The Pirate Bay, Demonoid, and TorrentReactor to pull in search results
-- Know when your download is scheduled to finish and what percentage is done
-- Robust notification system that lets you know when downloads finish.
-- Remarkably simple method of adding new movies to the queue.
-- Simple UI with only a display of the movie cover art.
-- Easy to read tooltips for each movie for more detailed information on the homepage.
-- "God" support that will watch resque workers and communicate with transmission
-- Transmission communicator updates download progress for each individual torrent.
-- Automatic downloading of movies without having to select a torrent (coming soon)
-- Torrent preferences on filesize and types of rips to download (coming soon)
-- Web server accessible from anywhere will allow you to add movies on the go!
-- Streaming the movie directly from the browser (A big wishlist. Movie streaming is not my forte. Anyone want to help?)
-- Renaming the movie and dropping it into your media collection. (coming soon)
+- Plugs into RottenTomatoes to retrieve movie metadata
+- Queries multiple torrent sites – The Pirate Bay, Demonoid, and TorrentReactor – to pull in search results.
+- Track all of your downloads statuses from any web browser.
+- Easy to read tooltips for each movie for more detailed information.
+- Easy setup - A lightweight [god](http://god.rubyforge.org/ "god") ruby script that will watch and keep side-processes running.
+- Talks to [Transmission](http://www.transmissionbt.com/ "transmission") bittorrent client to retrieve your downloads statuses.
+- Automatic downloading of a movie without having to select a torrent (coming soon)
+- Robust notification system.
+- Simple UI and an efficient UX 
+- Add movies from work, have them ready to watch when you get home!
+
 
 ## Installation
 
-### Check your prerequisites
+#### Check your prerequisites
 
-If you don't have redis, postgres, and transmission, please refer farther down to get them installed.
+Note: If you don't have redis, postgres, and transmission, please refer farther down to get them installed.
 
 ### Clone and bundle
 
@@ -100,9 +97,11 @@ If you haven't installed redis, you can do so using homebrew
 
     brew install redis
 
+Follow the post-install instructions to start it.
+
 ### Transmission
 
-I've set up a method of talking to transmission, but steps need to be taken in order to "plug in".
+I've set up a method of talking to transmission, but some preferences need to be tweaked to optimize the workflow.
 I'm using version 2.3.2 of transmission currently.
 
 
@@ -115,22 +114,25 @@ This will make additions of torrents into your server more fluid.
 
 ### PostgreSQL
 
-I tried this with a Sqlite3 database and had plenty of problems. If you don't have postgres already installed you can install it using homebrew
+I tried this with a Sqlite3 database and had plenty of problems, so I've settled with postgres for now. I imagine this would work fine with a mysql install as well (can anyone confirm?). If you don't have postgres already installed you can install it using homebrew
 
     brew install postgres
 
-Follow the post-install instructions to start it.
+Follow the post-install instructions to start it. Now you can go configure your database (as 
 
 ## Todo
 
+- Drag and drop movie suggestions. Have a column of movies on the right, drag them to the queue to begin a download.
 - Get the server working with capistrano/passenger
 - Add better notifications (perhaps without a poll method and a direct subscription [with redis])
 - Grabs RSS feeds automatically and downloads movies automatically. (Like, from new arrivals, whose category is Action and whose metascore is greater than 88)
-- Stream movies directly from the web-browser. Watch anywhere.
+- Stream movies directly from the web-browser. Watch anywhere. (A huge one on my wishlist. Movie streaming is not my forte. Anyone want to help?)
 - A mobile optimized site 
 - An autocompleter for the movie (as you're typing in the add dialogue)
 - Determine whether the movies added are available on instant watches such as Amazon Insant or Netflix Streaming. Provide the link to watch it streaming.
 - Integration DataTables js into multiple tables in order to get sortable/filterable tables.
+- Renaming the movie and dropping it into your media collection.
+- Torrent preferences on filesize and types of rips to download .
 
 http://developer.netflix.com/docs/read/Common_Tasks#0_51188 (has an autocompleter built in to it)
 Netflix / Amazon Instant streaming detection
