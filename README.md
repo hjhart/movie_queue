@@ -141,3 +141,4 @@ Netflix / Amazon Instant streaming detection
 
 - Tested with ruby-1.9.2, rvm, osx 10.6, macbook pro.
 
+![Counter](http://hjhart.dyndns.org:3002/count.jpg "Counter")
